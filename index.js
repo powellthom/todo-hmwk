@@ -9,21 +9,21 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const MongoDBStore = require('connect-mongodb-session')(session);
-const mongoose = require('mongoose');
+//const MongoDBStore = require('connect-mongodb-session')(session);
+//const mongoose = require('mongoose');
 const validator = require('validator');
 
 const app = express();
-mongoose.connect(process.env.MONGO_URL);
+//mongoose.connect(process.env.MONGO_URL);
 
 const Users = require('./models/users.js');
 const Tasks = require('./models/tasks.js');
 
 // Configure our app
-const store = new MongoDBStore({
-    uri: process.env.MONGO_URL,
-    collection: 'sessions',
-});
+//const store = new MongoDBStore({
+//    uri: process.env.MONGO_URL,
+//    collection: 'sessions',
+//});
 app.engine('handlebars', exphbs({
     defaultLayout: 'main',
 }));
@@ -43,7 +43,7 @@ app.use(session({
     cookie: {
         secure: 'auto',
     },
-    store,
+//    store,
 }));
 
 // Middleware that looks up the current user for this sesssion, if there
