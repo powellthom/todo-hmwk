@@ -4,26 +4,33 @@
 
 'use strict';
 
-
+const PORT=8080;
+const MONGO_URL='mongodb://powellthom:account1@ds161493.mlab.com:61493/tp-todo-hmwk';
+const SESSION_SECRET='4261Ln9MplIzXiOaHFZFq7Zq+1/Ksji3Xa+cs09uu8g=';
 const express = require('express');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-//const MongoDBStore = require('connect-mongodb-session')(session);
-//const mongoose = require('mongoose');
+const MongoDBStore = require('connect-mongodb-session')(session);
+const mongoose = require('mongoose');
 const validator = require('validator');
-
+// Get Mongoose to use the global promise library
+mongoose.Promise = global.Promise;
 const app = express();
-//mongoose.connect(process.env.MONGO_URL);
+mongoose.connect(process.env.MONGO_URL);
+const db = mongoose.connection;
+
+//Bind connection to error event (to get notification of connection errors)
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 const Users = require('./models/users.js');
 const Tasks = require('./models/tasks.js');
 
 // Configure our app
-//const store = new MongoDBStore({
-//    uri: process.env.MONGO_URL,
-//    collection: 'sessions',
-//});
+const store = new MongoDBStore({
+    uri: process.env.MONGO_URL,
+    collection: 'sessions',
+});
 app.engine('handlebars', exphbs({
     defaultLayout: 'main',
 }));
@@ -43,7 +50,7 @@ app.use(session({
     cookie: {
         secure: 'auto',
     },
-//    store,
+    store,
 }));
 
 // Middleware that looks up the current user for this sesssion, if there
