@@ -5,7 +5,8 @@
 'use strict';
 
 const PORT=8080;
-const MONGO_URL='mongodb://powellthom:account1@ds161493.mlab.com:61493/tp-todo-hmwk';
+// for some reason you still need to type MONGO_URL in at command line
+const MONGO_URL="mongodb://tgp22:account1@ds161493.mlab.com:61493/tp-todo-hmwk";
 const SESSION_SECRET='4261Ln9MplIzXiOaHFZFq7Zq+1/Ksji3Xa+cs09uu8g=';
 const express = require('express');
 const exphbs = require('express-handlebars');
