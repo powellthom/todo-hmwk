@@ -20,9 +20,14 @@ const UserSchema = new Schema({
         unique: true,
     },
     name: stringField,
-    hashed_password: stringField,
+    hased_password: {
+        type: String,
+        minlength: 1,
+        maxlength: 500,
+    },
 });
 
+/** I generate the hash in the controller
 UserSchema.pre('save', function userPreHook(next) {
     const user = this;
 
@@ -43,6 +48,7 @@ UserSchema.pre('save', function userPreHook(next) {
         });
     });
 });
+*/
 
 UserSchema.methods.comparePassword = function comparePassword(candidatePassword, cb) {
     bcrypt.compare(candidatePassword, this.hashed_password, (err, isMatch) => {

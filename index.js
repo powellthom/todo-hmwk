@@ -15,6 +15,9 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
+var salt = bcrypt.genSaltSync(10);
+
 // Get Mongoose to use the global promise library
 mongoose.Promise = global.Promise;
 const app = express();
@@ -82,11 +85,11 @@ app.use((req, res, next) => {
  * @param  {Function} next - sdfs
  * @returns {undefined}
  */
+
 function isLoggedIn(req, res, next) {
     if (res.locals.currentUser) {
         next();
     } else {
-//        res.sendStatus(403);
 	  res.send("Bro, you're not logged in :-(");
     }
 }
@@ -108,36 +111,48 @@ app.get('/', loadUserTasks, (req, res) => {
     res.render('index');
 });
 
-// Handle submitted form for new users
-app.post('/user/register', (req, res) => {
-    res.send('woot');
-});
-// Handle submitted form for new users.
-app.post('/user/register', (req, res) => {
-//    // Validate fields
-//    body('name').isLength({ min: 1 }).trim().withMessage('Name must be specified.')
-//            .isAlphanumeric().withMessage('Name has non-alphanumeric characters.'),
-//    body('email').isLength({ min: 1 }).trim().withMessage('Email must be specified.'),
-//    body('password').isLength({ min: 3 }).trim().withMessage('PW min of 3 characters.'),
-//    body('passwordConfirmation').isLength({ min: 3 }).trim().withMessage('PW min of 3 characters.'),
-    var users = new Users(
-        {
-            name: req.body.name,
-            email: req.body.email,
-            hashed_password: req.body.password
+app.post('/users/register', (req, res) => {
+	if (req.body.password==req.body.passwordConfirmation) {
+		var userName=req.body.name;
+		var userEmail=req.body.email;
+		var password=req.body.password;
+		var hash = bcrypt.hashSync(password, salt);
+        Users.create({
+                name: userName,
+                email: userEmail,
+                hashed_password: hash
         });
-    user.save(function (err) {
-        if (err) { return next(err);}
-        res.send('User Added');
-    })
+//        function (err, users_instance) {
+//        if (err) res.send('Error');	
+	console.log(userName+userEmail+hash);
+	res.redirect('/');
+	} else {
+		res.send("Passwords do not match");
+	}
 });
 
-app.post('/user/login', (req, res) => {
-    res.send('woot');
-});
+// I was making real progress, but...
+//  it's 10:50pm and i need to leave at 6:00am for a flight to
+//  South Africa
+//  I wish I had gotten this to work
+
+app.post('/users/login', (req, res) => {
+	var userEmail=req.body.email;
+        var password=req.body.password;
+        var hash = bcrypt.hashSync(password, salt);
+	Users.find({ 'email': userEmail },
+	function (err, users) {if (err) res.send('email does not exist');
+
+	if(users.email==undefined){
+		console.log('no match')
+	} else {
+		console.log('match!')
+	};
+	
+})});
 
 // Log a user out
-app.get('/user/logout', (req, res) => {
+app.get('/users/logout', (req, res) => {
     res.send('woot');
 });
 
@@ -155,7 +170,7 @@ app.post('/tasks/:id/delete', (req, res) => {
 });
 
 // Handle submission of new task form
-app.post('/task/create', (req, res) => {
+app.post('/tasks/create', (req, res) => {
     res.send('woot');
 });
 
