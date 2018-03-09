@@ -32,10 +32,14 @@ const store = new MongoDBStore({
     uri: process.env.MONGO_URL,
     collection: 'sessions',
 });
-app.engine('handlebars', exphbs({
+ app.engine('handlebars', exphbs({
     defaultLayout: 'main',
-}));
-app.set('view engine', 'handlebars');
+ }));
+ app.set('view engine', 'handlebars');
+// if pug // app.engine('pug', exphbs({
+// if pug //   defaultLayout: 'main',
+// if pug // }));
+// if pug // app.set('view engine', 'pug');
 
 // For parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({
@@ -82,7 +86,8 @@ function isLoggedIn(req, res, next) {
     if (res.locals.currentUser) {
         next();
     } else {
-        res.sendStatus(403);
+//        res.sendStatus(403);
+	  res.send("Bro, you're not logged in :-(");
     }
 }
 
@@ -106,6 +111,25 @@ app.get('/', loadUserTasks, (req, res) => {
 // Handle submitted form for new users
 app.post('/user/register', (req, res) => {
     res.send('woot');
+});
+// Handle submitted form for new users.
+app.post('/user/register', (req, res) => {
+//    // Validate fields
+//    body('name').isLength({ min: 1 }).trim().withMessage('Name must be specified.')
+//            .isAlphanumeric().withMessage('Name has non-alphanumeric characters.'),
+//    body('email').isLength({ min: 1 }).trim().withMessage('Email must be specified.'),
+//    body('password').isLength({ min: 3 }).trim().withMessage('PW min of 3 characters.'),
+//    body('passwordConfirmation').isLength({ min: 3 }).trim().withMessage('PW min of 3 characters.'),
+    var users = new Users(
+        {
+            name: req.body.name,
+            email: req.body.email,
+            hashed_password: req.body.password
+        });
+    user.save(function (err) {
+        if (err) { return next(err);}
+        res.send('User Added');
+    })
 });
 
 app.post('/user/login', (req, res) => {
